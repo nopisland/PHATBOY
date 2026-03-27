@@ -14,7 +14,7 @@
   Version name : V3
   Last modified on : 20/12/2016 20:31
   -------------------------------------
-  
+
   Changelog :
 
     Version 1 :
@@ -41,37 +41,34 @@
 
   - Added detection while turning
   - Added smart line calibration
-  
+
   - Inproved line detection issues
 
-  Version 4 : 
+  Version 4 :
   -----------
 
-  - Modified mecanical part include these modification in the code: 
+  - Modified mecanical part include these modification in the code:
     - Angle modified for the servo
     - Two different type of servo for two différent vertion of robot (please select robot before flash)
     - Adding debug mode
-    
+
 
 */
 // You nust to choose one robot to flash because there is 2 différents type of servo inside and the controls are not the same
-#define PhatboyBlue
-//#define PhatboyViolet
+//#define PhatboyBlue
+#define PhatboyViolet
 //#define DEBUG
 
 #include <Wire.h>
 #include <Servo.h>
-#include "VL53L0XMod.h" 
+#include "VL53L0XMod.h"
 
 #include "PHATBOY.Constantes.h"
 #include "PHATBOY.Fonctions.h"
 
-//IR 
-#define IR_SMALLD_NEC
-#include <IRsmallDecoder.h>
-#define remote 2
-IRsmallDecoder irDecoder(remote); //IR receiver connected to pin 2 in this example
-irSmallD_t irData;
+//IR
+
+
 
 VL53L0X sensor;
 VL53L0X sensor1;
@@ -108,60 +105,60 @@ void setup () {
   SetArm(LOW);
 
 
-  digitalWrite(LED_B,HIGH);
+  digitalWrite(LED_B,LOW);
 
- 
+
   Serial.begin(115200);
 
-  digitalWrite (OUT_NMOS, HIGH);
-
- 
+  digitalWrite(OUT_NMOS, HIGH);
 
 
-  delay(250);
- InitSensors ();
+
+
+ delay(250);
+  InitSensors();
   Serial.print("first print");
- Serial.println(sensor1.getAddress(),HEX);
-    Calibrate ();
-  servo.detach ();
+  Serial.println(sensor1.getAddress(), HEX);
+  Calibrate();
+  servo.detach();
 }
 
 void loop () {
 #ifdef DEBUG
-Serial.println("DEBUG");
-//Debug_Aquisition(); 
-Debug_Action();
+  Serial.println("DEBUG");
+  //Debug_Aquisition();
+  Debug_Action();
 
 
 
 #else
-Serial.println("NODEBUG");
-    static uint32_t tdetach = 0;
-    static byte need_detach = false;
+ 
+  static uint32_t tdetach = 0;
+  static byte need_detach = false;
 
 
   switch (etat) {
     case 0 :
 
       // Waiting until the button is pushed
-      if (GetStartButton ()or irDecoder.dataAvailable(irData)) {
-        
+      while((pulseIn(remote,LOW)<5000) and digitalRead(IN_BTN)==1);
+digitalWrite(LED_B,HIGH);
         timeSinceStartWaiting = millis();
         servo.attach (OUT_SERVO);
-        Calibrate ();
+        Calibrate();
         etat = 1;
-      }
+      
       break;
 
     case 1 :
       etat = 2; // bypass 5s waiting time
       if ((millis () - timeSinceStartWaiting) % 1000 > 500) {
-        
+
       } else {
         if (goToTheLeft) {
-         
+
         } else {
-         
+
         }
       }
 
@@ -176,7 +173,7 @@ Serial.println("NODEBUG");
 
     case 2 :
       SetArm (HIGH);
-      
+
       etat = 3;
       SetSpeed (255, 255);
       need_detach = true;
@@ -184,12 +181,12 @@ Serial.println("NODEBUG");
       break;
 
     case 3 :
-        if (need_detach && millis() - tdetach > 500)
-        {
-            need_detach = false;
-            servo.detach ();
-        }
-    
+      if (need_detach && millis() - tdetach > 500)
+      {
+        need_detach = false;
+        servo.detach ();
+      }
+
       if (goToTheLeft) {
         SetSpeed (-255, 255);
       } else {
@@ -200,7 +197,7 @@ Serial.println("NODEBUG");
       break;
 
     case 4 :
-      
+
       GetLines ();
       AvoidLines ();
 
@@ -208,36 +205,36 @@ Serial.println("NODEBUG");
         FocusRobot ();
         //SetSpeed (255, 255);
       }
-      
+
       if (!lLine && !rLine && !bLine) {
-        
+
       } else {
-         
+
       }
 
       /*if (GetStartButton ()) { // disable as push button is replaced by TSOP then avoid faulty reset*/
-/*
-        Reset (); 
-      }
+      /*
+              Reset ();
+            }
 
-      break;
-    
+            break;
+
+        }
+
+        bool batteryIsLow = IsBatteryLow (GetBattery ());
+
+        if (batteryIsLow) {
+          if (millis () % 1000 > 500) {
+
+          } else {
+
+          }
+        } else {
+
+        }
+      */
+
   }
-
-  bool batteryIsLow = IsBatteryLow (GetBattery ());
-
-  if (batteryIsLow) {
-    if (millis () % 1000 > 500) {
-
-    } else {
-
-    }
-  } else {
-
-  }
-*/
-
-}
 
 #endif
 }

@@ -34,7 +34,7 @@
 #define IN_IRRIGHT  A2  //CAPTLAVD
 #define IN_IRLEFT   A3  //CAPTLAVG
 #define XSHUT       5
-
+#define remote      2
 #define SDA         A4
 #define SCL         A5
 

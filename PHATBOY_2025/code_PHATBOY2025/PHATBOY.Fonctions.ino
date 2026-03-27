@@ -10,8 +10,9 @@ void InitPins() {
   pinMode(OUT_NMOS, OUTPUT);
   pinMode(IN_BATTERY, INPUT);
   pinMode(IN_BTN, INPUT_PULLUP);
+  pinMode(remote, INPUT);  
+  
   pinMode(XSHUT, OUTPUT);
-
   pinMode(LED_B, OUTPUT);
   pinMode(OUT_PWM0, OUTPUT);
   pinMode(OUT_PWM1, OUTPUT);
@@ -106,7 +107,7 @@ bool GetStartButton_orig() {
 
 bool GetStartButton() {
   if (digitalRead(IN_BTN) == 0) {
-    delay(10);
+
     return (digitalRead(IN_BTN) == 0);
   } else {
     return LOW;
@@ -302,7 +303,7 @@ void Debug_Aquisition(void) {
   int debug_ligne_AR = analogRead(IN_IRBACK);
   int debug_ligne_GAUCHE = analogRead(IN_IRLEFT);
   int debug_ligne_DROITE = analogRead(IN_IRRIGHT);
-  int debug_IR_receiver = irDecoder.dataAvailable(irData) ;  // define with de lib TODO
+ 
   int debug_Start_button = GetStartButton();
   int debug_state_batterie =  analogRead(A6);
   int debug_distance_sensor0 = sensor.readRangeContinuousMillimeters();
@@ -315,8 +316,7 @@ void Debug_Aquisition(void) {
   Serial.print(debug_ligne_GAUCHE );
   Serial.print("||RIGHT ==> ");
   Serial.println(debug_ligne_DROITE );
-  Serial.print("IR_Receiver ==> ");
-  Serial.print(debug_IR_receiver);
+
   Serial.print("  || start Button");
   Serial.print(debug_Start_button);    
   Serial.print("  || Batterie");
@@ -333,15 +333,17 @@ void Debug_Action(void) {
   //Mouvement souhaité
 
 
-  SetSpeed(255, 150); //Tout Droit 1s
+  SetSpeed(150, 150); //Tout Droit 1s
   Serial.println("Tout Droit");
-  delay(1000);
+  delay(500);
+  SetSpeed(0,0); 
+  delay(500);
   SetSpeed(0, 150); //Gauche 1S
   Serial.println("Gauche");
-  delay(1000);
-  SetSpeed(255, 0); //Droite 2s
+  delay(500);
+  SetSpeed(150, 0); //Droite 2s
   Serial.println("Droite");
-  delay(2000);/*
+  delay(1000);/*
  // SetSpeed(255, 255); //Tout Droit 1s
  // Serial.println("Tout Droit");
  // delay(1000);
