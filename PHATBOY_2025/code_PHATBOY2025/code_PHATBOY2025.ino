@@ -55,8 +55,8 @@
 
 */
 // You nust to choose one robot to flash because there is 2 différents type of servo inside and the controls are not the same
-//#define PhatboyBlue
-#define PhatboyViolet
+#define PhatboyBlue
+//#define PhatboyViolet
 //#define DEBUG
 
 #include <Wire.h>
@@ -105,7 +105,7 @@ void setup () {
   SetArm(LOW);
 
 
-  digitalWrite(LED_B,LOW);
+  digitalWrite(LED_B, LOW);
 
 
   Serial.begin(115200);
@@ -115,7 +115,7 @@ void setup () {
 
 
 
- delay(250);
+  delay(250);
   InitSensors();
   Serial.print("first print");
   Serial.println(sensor1.getAddress(), HEX);
@@ -132,7 +132,7 @@ void loop () {
 
 
 #else
- 
+
   static uint32_t tdetach = 0;
   static byte need_detach = false;
 
@@ -141,13 +141,16 @@ void loop () {
     case 0 :
 
       // Waiting until the button is pushed
-      while((pulseIn(remote,LOW)<5000) and digitalRead(IN_BTN)==1);
-digitalWrite(LED_B,HIGH);
-        timeSinceStartWaiting = millis();
-        servo.attach (OUT_SERVO);
-        Calibrate();
-        etat = 1;
-      
+      //(pulseIn(remote,LOW)<5000) and
+      while ((pulseIn(remote, LOW) < 5000)) {
+      //  if (digitalRead(IN_BTN) == 0)break;
+      }
+      digitalWrite(LED_B, HIGH);
+      timeSinceStartWaiting = millis();
+      servo.attach (OUT_SERVO);
+      Calibrate();
+      etat = 1;
+
       break;
 
     case 1 :
