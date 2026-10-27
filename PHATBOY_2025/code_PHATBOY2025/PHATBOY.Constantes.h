@@ -48,3 +48,12 @@
 #define OUT_PWM3   3  //BIN1
 
 #define OUT_SERVO  9
+
+
+
+
+
+const unsigned long HEADER_ON_MIN  = 8000;
+const unsigned long HEADER_ON_MAX  = 10000;
+const unsigned long HEADER_OFF_MIN = 4000;
+const unsigned long HEADER_OFF_MAX = 5000;

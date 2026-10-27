@@ -66,6 +66,8 @@
 #include "PHATBOY.Constantes.h"
 #include "PHATBOY.Fonctions.h"
 
+
+
 //IR
 
 
@@ -77,7 +79,7 @@ Servo servo;
 
 unsigned long timeSinceStartWaiting, timeBack;
 bool lLine, rLine, bLine;
-
+int test_trame = 1;
 int etat = 0;
 
 int mesuredBlack = 0;
@@ -100,6 +102,7 @@ void Tuple(unsigned long dist, unsigned long dist1)
 
 void setup () {
   InitPins();
+  pinMode(remote, INPUT_PULLUP);
 
   servo.attach(OUT_SERVO);
   SetArm(LOW);
@@ -132,29 +135,73 @@ void loop () {
 
 
 #else
-
+//Serial.println(etat);
   static uint32_t tdetach = 0;
   static byte need_detach = false;
 
 
   switch (etat) {
-    case 0 :
+    case 0:// test de la trame afin de voir qu'il ne s'agit pas de perturbations
+    
+             if (digitalRead(remote) == LOW) {
 
-      // Waiting until the button is pushed
-      //(pulseIn(remote,LOW)<5000) and
-      while ((pulseIn(remote, LOW) < 5000)) {
-      //  if (digitalRead(IN_BTN) == 0)break;
+    unsigned long debutON = micros();
+
+    // Mesurer la duree du signal ON
+    while (digitalRead(remote) == LOW) {
+      if (micros() - debutON > HEADER_ON_MAX) {
+        return;
       }
-      digitalWrite(LED_B, HIGH);
-      timeSinceStartWaiting = millis();
-      servo.attach (OUT_SERVO);
-      Calibrate();
-      etat = 1;
+    }
+
+    unsigned long dureeON = micros() - debutON;
+
+    // Verifier la duree du ON (environ 9 ms)
+    if (dureeON >= HEADER_ON_MIN &&
+        dureeON <= HEADER_ON_MAX) {
+
+      unsigned long debutOFF = micros();
+
+      // Mesurer la duree du OFF
+      while (digitalRead(remote) == HIGH) {
+        if (micros() - debutOFF > HEADER_OFF_MAX) {
+          return;
+        }
+      }
+
+      unsigned long dureeOFF = micros() - debutOFF;
+
+      // Verifier la duree du OFF (environ 4,5 ms)
+      if (dureeOFF >= HEADER_OFF_MIN &&
+          dureeOFF <= HEADER_OFF_MAX) {
+
+        Serial.println("Debut d'une trame NEC detecte !");
+        
+        // La conception s'arrete ici
+        etat =1;
+      }
+        }
+             }
+  
+
 
       break;
 
-    case 1 :
-      etat = 2; // bypass 5s waiting time
+    case 1:
+Serial.println("etat1");
+
+
+
+      digitalWrite(LED_B, HIGH);
+      timeSinceStartWaiting = millis();
+      servo.attach(OUT_SERVO);
+      Calibrate();
+      etat = 2;
+
+      break;
+
+    case 2 :
+      etat = 3; // bypass 5s waiting time
       if ((millis () - timeSinceStartWaiting) % 1000 > 500) {
 
       } else {
@@ -170,20 +217,20 @@ void loop () {
       }
 
       if (timeSinceStartWaiting + WAITTIME < millis ()) {
-        etat = 2;
+        etat = 3;
       }
       break;
 
-    case 2 :
+    case 3 :
       SetArm (HIGH);
 
-      etat = 3;
+      etat = 4;
       SetSpeed (255, 255);
       need_detach = true;
       tdetach = millis();
       break;
 
-    case 3 :
+    case 4 :
       if (need_detach && millis() - tdetach > 500)
       {
         need_detach = false;
@@ -196,10 +243,10 @@ void loop () {
         SetSpeed (255, -255);
       }
       delay (250 * 6 / GetBattery ());
-      etat = 4;
+      etat = 5;
       break;
 
-    case 4 :
+    case 5 :
 
       GetLines ();
       AvoidLines ();
@@ -240,4 +287,4 @@ void loop () {
   }
 
 #endif
-}
+} 

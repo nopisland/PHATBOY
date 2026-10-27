@@ -10,7 +10,8 @@ void InitPins() {
   pinMode(OUT_NMOS, OUTPUT);
   pinMode(IN_BATTERY, INPUT);
   pinMode(IN_BTN, INPUT_PULLUP);
-  pinMode(remote, INPUT);  
+  
+ 
   
   pinMode(XSHUT, OUTPUT);
   pinMode(LED_B, OUTPUT);
